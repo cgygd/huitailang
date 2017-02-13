@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+	*{ margin:0; padding:0; font-family:"微软雅黑";}
+	#outer{ background:url(img/game_bg.jpg) 0 0 no-repeat; height:480px; width:320px; position:relative;}
+	#scoring{ position:absolute; font-weight:bold; font-size:16px; color:white; left:65px; top:13px;}
+	#countDown{ position:absolute; background:url(img/progress.png) 0 0 no-repeat; width:180px; height:16px; left: 63px;top: 66px;}
+	#wolfs img{ position:absolute;}
+	#menu{ position:absolute; width:320px; text-align:center; left:0; top:200px;}
+	#start,#handle,#gameOver{ line-height:50px; font-size:30px; font-weight:bold; color:#F60; text-shadow:0 0 5px #FFFF00; display:block; text-decoration:none;}
+	#gameOver{ position:absolute; width:320px; text-align:center; top:200px; left:0; display:none;}
+	</style>
+
+</head>
+<body>
+<div id="outer">
+	<div id="scoring">0</div><!--这是分数-->
+    <div id="countDown"></div><!--倒计时-->
+    <div id="wolfs">
+    	 <!--<img src="img/h5.png"/>--> 
+    </div><!--灰太狼们-->
+    <div id="menu">
+        <a href="#" id="start">开始</a>
+        <a href="#" id="handle">游戏操作说明</a>
+    </div>
+    <div id="gameOver">game over!</div>
+</div>
+<script type="text/javascript">
+	var arrPos=[{l:"98px",t:"115px"},{l:"17px",t:"160px"},{l:"15px",t:"220px"},{l:"30px",t:"293px"},{l:"122px",t:"273px"},{l:"207px",t:"295px"},{l:"200px",t:"211px"},{l:"187px",t:"141px"},{l:"100px",t:"185px"}];
+	var scoring=document.getElementById("scoring");
+	var countDown=document.getElementById("countDown");
+	var wolfs=document.getElementById("wolfs");//所有狼的父级
+	var menu=document.getElementById("menu");//菜单
+	var start=document.getElementById("start");//开始按钮
+	var gameover=document.getElementById("gameOver");//游戏结束
+	var isend = false;
+
+	function rand () {
+	 	return Math.floor(Math.random() * 9);
+	} 
+	var times = null;
+	var time2 = null;
+	var time1 = null;
+	start.onclick = function () {
+		menu.style.display = 'none';
+		createImg();
+		var progressWidth = 180;
+		times = setInterval(function(){
+			progressWidth = progressWidth-1;
+			countDown.style.width = progressWidth+"px";
+			if (progressWidth <=0) {
+				clearInterval(times);
+				clearInterval(time1);
+				clearInterval(time2);
+				gameover.style.display = 'block';
+				isend =true;
+			};
+		},200);
+		
+	}
+	var type = null;
+	function createImg () {
+		if (isend) {
+			return;
+		}
+		type = rand() > 3 ? 'h':'x';
+		var img = document.createElement('img');
+		var r = rand()
+		img.style.left = arrPos[r].l;
+		img.style.top = arrPos[r].t;
+		wolfs.appendChild(img);
+		var index = 0;
+		time1 = setInterval(function () {
+			if(index==5){
+				time2 = setInterval(function() {
+					if(index == 0) {
+						wolfs.removeChild(img);
+						clearInterval(time2);
+						createImg();
+					} else {
+						index--;
+					img.src = 'img/'+type+index+'.png';
+					}
+				},100);
+			clearInterval(time1);	
+			} else {
+				index ++;
+			}
+			img.src = 'img/'+type+index+'.png';
+		}, 50);
+		img.onclick = function () {
+			this.onclick = null;
+			index = 6;
+			if(type == 'h') {
+				scoring.innerHTML = parseInt(scoring.innerHTML) + 10;
+			} else {
+				scoring.innerHTML = parseInt(scoring.innerHTML) -10;
+			}
+			clearInterval(time2);
+			clearInterval(time1);
+			var time3 = setInterval(function() {
+
+				img.src = 'img/'+type+index+'.png'; 
+				index++;
+				console.log(index);
+				if (index == 10) {
+					clearInterval(time3);
+					wolfs.removeChild(img);
+					createImg();
+				}
+			},50);
+		}
+	}
+</script>
+</body>
+</html>
